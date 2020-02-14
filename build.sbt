@@ -6,3 +6,4 @@ scalaVersion := "2.13.1"
 
 // https://mvnrepository.com/artifact/org.twitter4j/twitter4j-stream
 libraryDependencies += "org.twitter4j" % "twitter4j-stream" % "4.0.0"
+libraryDependencies += "org.apache.kafka" % "kafka-clients" % "2.0.0"
