@@ -1,3 +1,4 @@
+/*
 package stjester.twitter
 
 import stjester.twitter.TwitterStream.Util
@@ -100,4 +101,4 @@ object UkraineStreamer {
     twitterStream.cleanUp()
     twitterStream.shutdown()
   }
-}
+}*/
