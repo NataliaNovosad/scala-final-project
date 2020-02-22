@@ -1,4 +1,3 @@
-/*
 package stjester.twitter
 
 import stjester.twitter.TwitterStream.Util
@@ -74,6 +73,10 @@ object AustinStreamer {
     Thread.sleep(20000)
     twitterStream.cleanUp()
     twitterStream.shutdown()
+
+    val producer = new Producer()
+    producer.writeToKafka("test", "testvalue")
+
     println(TweetStatistics.count_of_tweets)
   }
 
@@ -101,4 +104,4 @@ object UkraineStreamer {
     twitterStream.cleanUp()
     twitterStream.shutdown()
   }
-}*/
+}

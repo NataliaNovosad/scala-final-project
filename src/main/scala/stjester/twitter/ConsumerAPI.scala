@@ -1,13 +1,14 @@
+package stjester.twitter
+
 import java.util
+import java.util.Properties
 
 import org.apache.kafka.clients.consumer.KafkaConsumer
-
-import java.util.Properties
 
 import scala.collection.JavaConverters._
 
 class Consumer {
-  def consumeFromKafka(topic: String) = {
+  def consumeFromKafka(topic: String): Unit = {
     val props = new Properties()
     props.put("bootstrap.servers", "localhost:9093")
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
@@ -27,5 +28,5 @@ class Consumer {
 
 object read extends App{
   val consumer = new Consumer()
-  consumer.consumeFromKafka("my-kafka-topic")
+  consumer.consumeFromKafka("test")
 }
