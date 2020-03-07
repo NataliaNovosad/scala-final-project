@@ -2,7 +2,7 @@ import java.util.Properties
 
 import org.apache.kafka.clients.producer._
 
-class Producer {
+class ProducerTest {
 
   def writeToKafka(topic: String): Unit = {
     val props = new Properties()
@@ -18,7 +18,7 @@ class Producer {
 }
 
 object send extends App{
-  val producer = new Producer()
+  val producer = new ProducerTest()
   producer.writeToKafka("my-kafka-topic")
 }
 
