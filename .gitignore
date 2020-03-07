@@ -1,2 +1,9 @@
 .idea
 target
+/reddit-streaming/src/resources/reddit_comments_data.csv
+/reddit-streaming/src/resources/reddit_comments_data0.csv
+/reddit-streaming/src/resources/reddit_comments_data1.csv
+/reddit-streaming/src/resources/reddit_comments_data2.csv
+/reddit-streaming/src/resources/reddit_comments_data3.csv
+/reddit-streaming/src/resources/reddit_comments_data4.csv
+/reddit-streaming/src/resources/Reddit_data.zip
