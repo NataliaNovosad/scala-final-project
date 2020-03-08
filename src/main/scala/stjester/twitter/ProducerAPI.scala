@@ -20,7 +20,7 @@ class Producer {
 
 object send extends App{
   val producer = new Producer()
-  producer.writeToKafka("test", "testvalue")
+  producer.writeToKafka("twitter", "testvalue")
 }
 
 

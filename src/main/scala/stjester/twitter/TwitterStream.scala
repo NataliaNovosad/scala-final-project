@@ -1,39 +1,72 @@
 package stjester.twitter
 
-import stjester.twitter.TwitterStream.Util
-import twitter4j.conf.Configuration
-import twitter4j._
+import java.util.Date
 
-object TweetStatistics{
-  var count_of_tweets = 0;
+import net.liftweb.json.DefaultFormats
+import net.liftweb.json.Serialization.write
+import stjester.twitter.TwitterStream.Util
+import twitter4j._
+import twitter4j.conf.Configuration
+
+case class TweetUser(name: String, screenName: String, location: String, followersCount: Int) {}
+
+case class Place(country: String, streetAddress: String, placeType: String) {}
+
+case class General(createdAt: Date, tweetText: String, tweetTextLength: Int, source: String) {}
+
+case class JsonObjectTwitter(user: TweetUser, places: Place, general: General) {
+
+  //  def buildObject(us: TweetUser, pl: Place, gen: General): Unit =
+  //  {
+  //    this.user = us;
+  //    this.places = pl;
+  //    this.general = gen;
+  //  }
 }
+
+
 object TwitterStream {
   def main(args: Array[String]) {
     val twitterStream = new TwitterStreamFactory(Util.config).getInstance
     twitterStream.addListener(Util.simpleStatusListener)
     twitterStream.sample()
-    Thread.sleep(5000)
+    Thread.sleep(500)
     twitterStream.cleanUp()
     twitterStream.shutdown()
   }
 
   object Util {
+    val producer = new Producer()
+    var counter: Int = 0
+
     val config: Configuration = new twitter4j.conf.ConfigurationBuilder()
       .setOAuthConsumerKey(AccessTokens.APIkey)
       .setOAuthConsumerSecret(AccessTokens.APIkeysecret)
       .setOAuthAccessToken(AccessTokens.accesstoken)
       .setOAuthAccessTokenSecret(AccessTokens.accesstokensecret)
+      .setDebugEnabled(false)
       .build
 
     def simpleStatusListener: StatusListener = new StatusListener() {
+      //todo: write to stream
       def onStatus(status: Status) {
-        TweetStatistics.count_of_tweets += 1
-        println("user:", "name: "+status.getUser.getName,"ScreenName: "+status.getUser.getScreenName,"Location: "+status.getUser.getLocation, "FollowersCount: "+status.getUser.getFollowersCount, "\n" )
-        println("places:", "country: "+status.getPlace.getCountry, "StreetAddress:" + status.getPlace.getStreetAddress, "PlaceType: " + status.getPlace.getPlaceType, "\n")
-        println("general:", status.getCreatedAt,status.getText,  status.getText.length, status.getSource, "\n" )
-        println("hashtags")
-        status.getHashtagEntities.foreach(f=>print(f.getText))
-        println("===================================================================================================================================")
+        val usr = new TweetUser(status.getUser.getName, status.getUser.getScreenName, status.getUser.getLocation, status.getUser.getFollowersCount)
+        val place = new Place(status.getPlace.getCountry, status.getPlace.getStreetAddress, status.getPlace.getPlaceType)
+        val general = new General(status.getCreatedAt, status.getText, status.getText.length, status.getSource)
+
+        val jsonObjectTwitter: JsonObjectTwitter = JsonObjectTwitter(usr, place, general)
+
+        implicit val formats: DefaultFormats.type = DefaultFormats
+        val jsonString = write(jsonObjectTwitter)
+
+        producer.writeToKafka("twitter", jsonString)
+
+        //        println("user:", "name: " + status.getUser.getName, "ScreenName: " + status.getUser.getScreenName, "Location: " + status.getUser.getLocation, "FollowersCount: " + status.getUser.getFollowersCount, "\n")
+        //        println("places:", "country: " + status.getPlace.getCountry, "StreetAddress:" + status.getPlace.getStreetAddress, "PlaceType: " + status.getPlace.getPlaceType, "\n")
+        //                println("general:", status.getCreatedAt, status.getText, status.getText.length, status.getSource, "\n")
+        //        println("hashtags")
+        //        status.getHashtagEntities.foreach(f => print(f.getText))
+        //        println("===================================================================================================================================")
       }
 
       def onDeletionNotice(statusDeletionNotice: StatusDeletionNotice) {}
@@ -41,7 +74,7 @@ object TwitterStream {
       def onTrackLimitationNotice(numberOfLimitedStatuses: Int) {}
 
       def onException(ex: Exception) {
-        ex.printStackTrace()
+        //        ex.printStackTrace()
       }
 
       def onScrubGeo(arg0: Long, arg1: Long) {}
@@ -70,14 +103,14 @@ object AustinStreamer {
 
     //    val boundingBoxOfUS = Array(Array(-124.848974, 24.396308), Array(-66.885444, 49.384358))
     twitterStream.filter(new FilterQuery().locations(austinBox))
-    Thread.sleep(20000)
+    println("Started " + this.getClass.getName)
+    Thread.sleep(500)
     twitterStream.cleanUp()
     twitterStream.shutdown()
 
-    val producer = new Producer()
-    producer.writeToKafka("test", "testvalue")
+    //    val producer = new Producer()
+    //    producer.writeToKafka("twitter", "testvalue")
 
-    println(TweetStatistics.count_of_tweets)
   }
 
 
@@ -96,7 +129,7 @@ object UkraineStreamer {
 
     //    val bb: Array[Double] = new Array((lat1, longitude1), (lat2, longitude2))
 
-    val ukraineBox = Array(Array(longitude1, lat1 ), Array(longitude2, lat2))
+    val ukraineBox = Array(Array(longitude1, lat1), Array(longitude2, lat2))
 
     //    val boundingBoxOfUS = Array(Array(-124.848974, 24.396308), Array(-66.885444, 49.384358))
     twitterStream.filter(new FilterQuery().locations(ukraineBox))
