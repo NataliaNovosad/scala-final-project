@@ -48,7 +48,6 @@ object TwitterStream {
       .build
 
     def simpleStatusListener: StatusListener = new StatusListener() {
-      //todo: write to stream
       def onStatus(status: Status) {
         val usr = new TweetUser(status.getUser.getName, status.getUser.getScreenName, status.getUser.getLocation, status.getUser.getFollowersCount)
         val place = new Place(status.getPlace.getCountry, status.getPlace.getStreetAddress, status.getPlace.getPlaceType)
