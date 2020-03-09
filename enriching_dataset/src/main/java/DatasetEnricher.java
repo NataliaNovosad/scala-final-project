@@ -5,6 +5,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.GlobalKTable;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,19 +23,16 @@ public class DatasetEnricher {
 
         StreamsBuilder builder = new StreamsBuilder();
 
-        GlobalKTable<String, String> reddit_topic = builder.globalTable("reddit");
+//        GlobalKTable<String, String> reddit_topic = builder.globalTable("reddit");
 
         KStream<String, String> twitter_topic = builder.stream("twitter");
+//        KStream<String, String> reddit_topic = builder.stream("reddit");
+
+        KTable<String, String> reddit_table = builder.table("reddit");
 
         KStream<String, String> TwitterReddit =
-                twitter_topic.leftJoin(reddit_topic,
-                        (key, value) -> key,
+                twitter_topic.leftJoin(reddit_table,
                         (twitter_top, reddit_top) -> {
-                            System.out.println(twitter_top);
-                            System.out.println(reddit_top);
-                            System.out.println("=================");
-
-
                             if (reddit_top != null) {
                                 List<String> words1 = Arrays.asList(reddit_top.split(" "));
                                 List<String> words2 = Arrays.asList(twitter_top.split(" "));
@@ -47,6 +45,25 @@ public class DatasetEnricher {
                                 return "Twitter=" + twitter_top + ",Reddit=null";
                             }
                         }
+//                        (key, value) -> key,
+//                        (twitter_top, reddit_top) -> {
+////                            System.out.println(twitter_top);
+////                            System.out.println(reddit_top);
+////                            System.out.println("=================");
+//
+//
+//                            if (reddit_top != null) {
+//                                List<String> words1 = Arrays.asList(reddit_top.split(" "));
+//                                List<String> words2 = Arrays.asList(twitter_top.split(" "));
+//                                if (words1.containsAll(words2) && words2.containsAll(words1)) {
+//                                    return "Reddit=" + reddit_top + ",Twitter=[" + twitter_top + "]";
+//                                } else {
+//                                    return "Reddit=" + reddit_top + ",Twitter=null";
+//                                }
+//                            } else {
+//                                return "Twitter=" + twitter_top + ",Reddit=null";
+//                            }
+//                        }
                 );
         TwitterReddit.to("finaltopic");
 
