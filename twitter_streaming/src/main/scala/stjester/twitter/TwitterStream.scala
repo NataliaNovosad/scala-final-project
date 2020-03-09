@@ -59,14 +59,17 @@ object TwitterStream {
         val jsonString = write(jsonObjectTwitter)
 
         producer.writeToKafka("twitter", jsonString)
-
+        val name = status.getUser.getName
+        println(s"record processed. from twitter-user: $name")
         //        println("user:", "name: " + status.getUser.getName, "ScreenName: " + status.getUser.getScreenName, "Location: " + status.getUser.getLocation, "FollowersCount: " + status.getUser.getFollowersCount, "\n")
         //        println("places:", "country: " + status.getPlace.getCountry, "StreetAddress:" + status.getPlace.getStreetAddress, "PlaceType: " + status.getPlace.getPlaceType, "\n")
         //                println("general:", status.getCreatedAt, status.getText, status.getText.length, status.getSource, "\n")
         //        println("hashtags")
         //        status.getHashtagEntities.foreach(f => print(f.getText))
         //        println("===================================================================================================================================")
+
       }
+
 
       def onDeletionNotice(statusDeletionNotice: StatusDeletionNotice) {}
 
@@ -103,9 +106,10 @@ object AustinStreamer {
     //    val boundingBoxOfUS = Array(Array(-124.848974, 24.396308), Array(-66.885444, 49.384358))
     twitterStream.filter(new FilterQuery().locations(austinBox))
     println("Started " + this.getClass.getName)
-    Thread.sleep(500)
+    Thread.sleep(5000)
     twitterStream.cleanUp()
     twitterStream.shutdown()
+
 
     //    val producer = new Producer()
     //    producer.writeToKafka("twitter", "testvalue")
@@ -132,6 +136,7 @@ object UkraineStreamer {
 
     //    val boundingBoxOfUS = Array(Array(-124.848974, 24.396308), Array(-66.885444, 49.384358))
     twitterStream.filter(new FilterQuery().locations(ukraineBox))
+    println("Started " + this.getClass.getName)
     Thread.sleep(20000)
     twitterStream.cleanUp()
     twitterStream.shutdown()

@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 class Consumer {
   def consumeFromKafka(topic: String): Unit = {
     val props = new Properties()
-    props.put("bootstrap.servers", "localhost:9093")
+    props.put("bootstrap.servers", "localhost:9092")
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
     props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
     props.put("auto.offset.reset", "latest")
@@ -28,5 +28,5 @@ class Consumer {
 
 object read extends App{
   val consumer = new Consumer()
-  consumer.consumeFromKafka("test")
+  consumer.consumeFromKafka("twitter")
 }
